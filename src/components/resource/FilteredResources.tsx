@@ -1,4 +1,4 @@
-import { Button, Grid } from "@mui/material";
+import { Button, CircularProgress, Grid } from "@mui/material";
 import { useCallback, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import axios from "../../utils/axiosConfig";
@@ -21,11 +21,13 @@ import VehicleCardShort from "../shared/vehicles/VehicleCardShort";
 const FilteredResources = () => {
   const { key } = useParams<string>();
   const [resources, setResources] = useState<BaseProp>();
+  const [isLoading, setIsLoading] = useState<boolean>(true);
 
   const fetchResources = useCallback(async () => {
     const res = await axios.get(`/${key}`);
     let data: BaseProp = res.data;
     setResources(data);
+    setIsLoading(false);
   }, [key]);
 
   useEffect(() => {
@@ -69,43 +71,47 @@ const FilteredResources = () => {
     }
   };
 
-  return resources != null ? (
-    <div>
-      <Grid
-        container
-        spacing={{ xs: 2, md: 3 }}
-        columns={{ xs: 4, sm: 8, md: 12 }}
-      >
-        {resources.results?.map((value, index) => {
-          return (
-            <Grid item xs={4} sm={8} md={4} key={index}>
-              {renderCard(value)}
-            </Grid>
-          );
-        })}
-      </Grid>
-      <br />
-      <div
-        style={{
-          display: "flex",
-          alignContent: "center",
-          justifyContent: "center",
-        }}
-      >
-        {resources.previous ? (
-          <Button onClick={handlePrevious} variant="outlined">
-            Prev
-          </Button>
-        ) : null}
-        {resources.next ? (
-          <Button onClick={handleNext} variant="outlined">
-            Next
-          </Button>
-        ) : null}
+  return !isLoading ? (
+    resources != null ? (
+      <div>
+        <Grid
+          container
+          spacing={{ xs: 2, md: 3 }}
+          columns={{ xs: 4, sm: 8, md: 12 }}
+        >
+          {resources.results?.map((value, index) => {
+            return (
+              <Grid item xs={4} sm={8} md={4} key={index}>
+                {renderCard(value)}
+              </Grid>
+            );
+          })}
+        </Grid>
+        <br />
+        <div
+          style={{
+            display: "flex",
+            alignContent: "center",
+            justifyContent: "center",
+          }}
+        >
+          {resources.previous ? (
+            <Button onClick={handlePrevious} variant="outlined">
+              Prev
+            </Button>
+          ) : null}
+          {resources.next ? (
+            <Button onClick={handleNext} variant="outlined">
+              Next
+            </Button>
+          ) : null}
+        </div>
       </div>
-    </div>
+    ) : (
+      <h1>No resources</h1>
+    )
   ) : (
-    <h1>No resources</h1>
+    <CircularProgress />
   );
 };
 

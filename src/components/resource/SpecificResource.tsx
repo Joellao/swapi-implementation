@@ -15,6 +15,7 @@ import PersonCard from "../shared/people/PersonCard";
 import PlanetCard from "../shared/planets/PlanetCard";
 import SpecieCard from "../shared/species/SpecieCard";
 import StarshipCard from "../shared/starships/StarshipCard";
+import { CircularProgress } from "@mui/material";
 
 const SpecificResource = () => {
   const { key, id } = useParams<string>();
@@ -28,10 +29,17 @@ const SpecificResource = () => {
     | VehicleProp
     | null
   >();
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+
   const fetchFromAPI = async () => {
-    const res = await axios.get(`https://swapi.dev/api/${key}/${id}`);
-    let data = res.data;
-    setResource(data);
+    try {
+      const res = await axios.get(`https://swapi.dev/api/${key}/${id}`);
+      let data = res.data;
+      setResource(data);
+    } catch (e) {
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   useEffect(() => {
@@ -66,7 +74,11 @@ const SpecificResource = () => {
   if (location.state != null) {
     return <div>{renderCard(location.state)}</div>;
   }
-  return <></>;
+  return isLoading ? (
+    <CircularProgress />
+  ) : (
+    <h1>This resource doesn't exist</h1>
+  );
 };
 
 export default SpecificResource;

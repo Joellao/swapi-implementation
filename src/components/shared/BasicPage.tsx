@@ -96,7 +96,9 @@ const BasicPage = (props: Props) => {
   const [search, setSearch] = useState<string>("");
   const [selectResource, setSelectResource] = useState<string>("people");
   const { window } = props;
-  const [mobileOpen, setMobileOpen] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+
   const { logout } = useAuth()!;
 
   const navigate = useNavigate();
@@ -112,6 +114,7 @@ const BasicPage = (props: Props) => {
     });
 
     setResources(array);
+    setIsLoading(false);
   };
 
   const handleSearch = async (e: React.FormEvent<HTMLFormElement>) => {

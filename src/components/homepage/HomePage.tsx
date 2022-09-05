@@ -1,4 +1,4 @@
-import { Grid } from "@mui/material";
+import { CircularProgress, Grid } from "@mui/material";
 import axios from "../../utils/axiosConfig";
 import { useCallback, useEffect, useState } from "react";
 import {
@@ -19,6 +19,7 @@ import VehicleCardShort from "../shared/vehicles/VehicleCardShort";
 
 const HomePage = () => {
   const [allResources, setAllResources] = useState<BaseProp[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
 
   const fetchResources = async (key: string) => {
     const res = await axios.get(`/${key}`);
@@ -36,11 +37,12 @@ const HomePage = () => {
     const allArrays = [people, films, planets, species, starships, vehicles];
 
     setAllResources(allArrays);
+    setIsLoading(false);
   }, []);
 
   useEffect(() => {
     fetchFirstPageOfResources();
-  }, [fetchFirstPageOfResources]);
+  }, [fetchFirstPageOfResources, setIsLoading]);
 
   const renderCard = (
     value:
@@ -66,26 +68,30 @@ const HomePage = () => {
     }
   };
 
-  return allResources.length !== 0 ? (
-    <div>
-      <Grid
-        container
-        spacing={{ xs: 2, md: 3 }}
-        columns={{ xs: 4, sm: 8, md: 12 }}
-      >
-        {allResources.map((value, index) => {
-          return value.results.map((value, indexResults) => {
-            return (
-              <Grid item xs={4} sm={8} md={4} key={value.url}>
-                {renderCard(value)}
-              </Grid>
-            );
-          });
-        })}
-      </Grid>
-    </div>
+  return !isLoading ? (
+    allResources.length !== 0 ? (
+      <div>
+        <Grid
+          container
+          spacing={{ xs: 2, md: 3 }}
+          columns={{ xs: 4, sm: 8, md: 12 }}
+        >
+          {allResources.map((value, index) => {
+            return value.results.map((value, indexResults) => {
+              return (
+                <Grid item xs={4} sm={8} md={4} key={value.url}>
+                  {renderCard(value)}
+                </Grid>
+              );
+            });
+          })}
+        </Grid>
+      </div>
+    ) : (
+      <div>No Resources</div>
+    )
   ) : (
-    <div>No Resources</div>
+    <CircularProgress />
   );
 };
 
